@@ -81,7 +81,8 @@ class _DashboardState extends State<Dashboard> {
         title: Text(widget.title),
         centerTitle: true,
       ),
-      body: Center(
+      body: Container(
+        width: double.infinity,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -91,7 +92,7 @@ class _DashboardState extends State<Dashboard> {
                 visible: _show3DModel,
                 child: const SizedBox(
                   height: 300,
-                  width: 300,
+                  width: 500,
                   child: ModelViewer(
                     backgroundColor: Colors.transparent,
                     src: 'assets/3d_models/solar_tracker_model.gltf',
