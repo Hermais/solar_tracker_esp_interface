@@ -1,23 +1,21 @@
+
 import 'package:flutter/material.dart';
 
+import 'features/main_interface/presentation/screens/dashboard.dart';
+
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flu'
-          'tter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const Placeholder(),
+      title: 'Flutter Knob Demo',
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: const Dashboard(title: 'Flutter Knob Demo'),
     );
   }
 }
+
