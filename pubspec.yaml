@@ -50,6 +50,12 @@ dev_dependencies:
   model_viewer_plus:
   babylonjs_viewer:
   flutter_inappwebview:
+  flutter_bloc:
+  get_it:
+  flutter_launcher_icons:
+  firebase_core:
+  firebase_database:
+  firebase_auth:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -68,6 +74,7 @@ flutter:
   #   - images/a_dot_ham.jpeg
   assets:
     - assets/3d_models/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -94,3 +101,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/icon.jpg"
