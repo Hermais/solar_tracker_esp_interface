@@ -13,7 +13,7 @@ class DataCubit extends Cubit<DataState> {
   void setHorizontalAngle(double angle) async{
     emit(DataSendLoading());
     try{
-       await FirebaseDatabase.instance.ref('/ESP/HorizontalAngle').set(angle);
+       await FirebaseDatabase.instance.ref('/ESP/HorizontalAngle').set(angle.toInt());
     }catch(e){
       emit(DataSendError(e.toString()));
     }
@@ -23,8 +23,19 @@ class DataCubit extends Cubit<DataState> {
   void setVerticalAngle(double angle) async{
     emit(DataSendLoading());
     try{
-       await FirebaseDatabase.instance.ref('/ESP/VerticalAngle').set(angle);
+       await FirebaseDatabase.instance.ref('/ESP/VerticalAngle').set(angle.toInt());
     }catch(e){
+      emit(DataSendError(e.toString()));
+    }
+    emit(DataSendLoaded());
+  }
+
+  void setMode(bool mode) async{
+    emit(DataSendLoading());
+    try{
+       await FirebaseDatabase.instance.ref('/ESP/Mode').set(mode);
+    }catch(e){
+      print("Set Mode Error: $e");
       emit(DataSendError(e.toString()));
     }
     emit(DataSendLoaded());

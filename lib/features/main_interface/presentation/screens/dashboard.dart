@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:knob_widget/knob_widget.dart';
+import 'package:solar_tracker_esp_interface/features/main_interface/presentation/widgets/switch.dart';
 import '../bloc/data_cubit.dart';
 import '../widgets/knob_wheel.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-const _precisionDecimalDigits = 2;
+const _precisionDecimalDigits = 0;
 const _startAngle = -45.0;
 const _endAngle = 225.0;
 const _minimum = 0.0;
@@ -38,6 +39,9 @@ class _DashboardState extends State<Dashboard> {
 
   late KnobController _armKnobController;
   late double _armKnobValue;
+
+
+  var _isModeSwitched = false;
 
   void valueChangedListenerBodyKnob(double value) {
     if (mounted) {
@@ -88,16 +92,12 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     final KnobStyle style = KnobStyle(
-      labelStyle: Theme
-          .of(context)
-          .textTheme
-          .bodySmall,
+      labelStyle: Theme.of(context).textTheme.bodySmall,
       tickOffset: _tickOffset,
       labelOffset: _labelOffset,
       minorTicksPerInterval: _minorTicksPerInterval,
       showMinorTickLabels: _showMinorTickLabels,
     );
-
 
     return Scaffold(
       appBar: AppBar(
@@ -106,15 +106,23 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: BlocListener<DataCubit, DataState>(
         listener: (context, state) {
-          if(state is DataFetchLoaded){
+          if (state is DataFetchLoaded) {
             print("Data is loaded! Setting the Knob values.");
 
-            _armKnobController.setCurrentValue(
-                (state)
-                    .data!['VerticalAngle']);
-            _bodyKnobController.setCurrentValue(
-                (state)
-                    .data!['HorizontalAngle']);
+            _armKnobController.setCurrentValue((state).data!['VerticalAngle']);
+            _bodyKnobController.setCurrentValue((state).data!['HorizontalAngle']);
+            setState(() {
+              _isModeSwitched = (state).data!['Mode'];
+            });
+
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Data is updated from server successfully!'),
+                  elevation: 10,
+                ),
+              );
           }
         },
         child: SizedBox(
@@ -169,10 +177,24 @@ class _DashboardState extends State<Dashboard> {
                             label: 'Body Knob Value: ${_bodyKnobValue.toString()}'),
                         const SizedBox(width: _minHorizontalSeparation),
                         //  vertical line
-                        Container(
-                          width: 1,
-                          height: _size,
-                          color: Colors.black,
+                        Column(
+                          children: [
+                            Container(
+                              width: 1,
+                              height: _size,
+                              color: Colors.black,
+                            ),
+                            MyToggleSwitch(
+                              isSwitched: _isModeSwitched,
+                              onChanged: (val) {
+                                context.read<DataCubit>().setMode(val);
+                                setState(() {
+                                  _isModeSwitched = val;
+                                });
+                              },
+                            ),
+                            const Text("Current Mode")
+                          ],
                         ),
                         const SizedBox(width: _minHorizontalSeparation),
 
@@ -184,19 +206,19 @@ class _DashboardState extends State<Dashboard> {
                         ),
                       ],
                     ),
-
                   ),
                 ),
-                OutlinedButton(onPressed: () {
-                  BlocProvider.of<DataCubit>(context).getDataSnapshot();
-                }, child: const Text("Update From Server"),),
+                OutlinedButton(
+                  onPressed: () {
+                    BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                  },
+                  child: const Text("Update From Server"),
+                ),
               ],
             ),
           ),
         ),
       ),
-
-
     );
   }
 

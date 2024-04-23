@@ -17,7 +17,6 @@ void main() async {
         ),
         BlocProvider(
           create: (context) => sl<DataCubit>()..getDataSnapshot(),
-          lazy: false,
         ),
       ],
       child: MyApp(),
@@ -49,7 +48,7 @@ class MyApp extends StatelessWidget {
           if (state is AuthLoaded) {
             return const Dashboard(title: 'Flutter Knob Demo');
           }
-          return Splash();
+          return const Splash();
         },
       ),
     );
