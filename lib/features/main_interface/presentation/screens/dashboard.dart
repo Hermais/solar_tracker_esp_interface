@@ -14,13 +14,11 @@ const _startAngle = -45.0;
 const _endAngle = 225.0;
 const _minimum = 0.0;
 const _maximum = 180.0;
-const _size = 150.0;
+
 const _labelOffset = -10.05;
 const _tickOffset = 5.0;
 const _minorTicksPerInterval = 12;
 const _showMinorTickLabels = true;
-
-const _minHorizontalSeparation = 10.0;
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key, required this.title});
@@ -39,7 +37,6 @@ class _DashboardState extends State<Dashboard> {
 
   late KnobController _armKnobController;
   late double _armKnobValue;
-
 
   var _isModeSwitched = false;
 
@@ -99,6 +96,17 @@ class _DashboardState extends State<Dashboard> {
       showMinorTickLabels: _showMinorTickLabels,
     );
 
+    var knobSize = MediaQuery.of(context).size.width / 4.5;
+
+    final intrinsicDeviceWidth = MediaQuery.of(context).size.width;
+    final intrinsicDeviceHeight = MediaQuery.of(context).size.height;
+
+    print("Intrinsic Device Width: $intrinsicDeviceWidth");
+    print("Intrinsic Device Height: $intrinsicDeviceHeight");
+    var modelWindowSize = intrinsicDeviceWidth * 0.95;
+
+    const minHorizontalSeparation = 5.0;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
@@ -109,18 +117,36 @@ class _DashboardState extends State<Dashboard> {
           if (state is DataFetchLoaded) {
             print("Data is loaded! Setting the Knob values.");
 
-            _armKnobController.setCurrentValue((state).data!['VerticalAngle']);
-            _bodyKnobController.setCurrentValue((state).data!['HorizontalAngle']);
-            setState(() {
-              _isModeSwitched = (state).data!['Mode'];
-            });
-
+            try {
+              _armKnobController.setCurrentValue(double.parse(
+                (state).data!['VerticalAngle'].toString(),
+              ));
+              _bodyKnobController.setCurrentValue(double.parse(
+                (state).data!['HorizontalAngle'].toString(),
+              ));
+              setState(() {
+                _isModeSwitched = (state).data!['Mode'];
+              });
+            } catch (e) {
+              print("Error setting knob values: $e");
+              context.read<DataCubit>().emit(DataFetchError(error: e.toString()));
+            }
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
               ..showSnackBar(
                 const SnackBar(
                   content: Text('Data is updated from server successfully!'),
                   elevation: 10,
+                ),
+              );
+          } else if (state is DataFetchError) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Error fetching data from server!'),
+                  elevation: 10,
+                  backgroundColor: Colors.red,
                 ),
               );
           }
@@ -132,24 +158,46 @@ class _DashboardState extends State<Dashboard> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Visibility(
-                  visible: _show3DModel,
-                  child: const SizedBox(
-                    height: 300,
-                    width: 500,
-                    child: ModelViewer(
-                      backgroundColor: Colors.transparent,
-                      src: 'assets/3d_models/solar_tracker_model.gltf',
-                      alt: '3D Model',
-                      autoRotate: true,
-                      disableZoom: false,
-                      loading: Loading.eager,
-                      reveal: Reveal.auto,
-                      cameraControls: true,
-                      autoPlay: true,
-                    ),
+                Container(
+                  width: modelWindowSize,
+                  height: modelWindowSize,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                  child: _show3DModel
+                      ? Visibility(
+                          visible: _show3DModel,
+                          child: SizedBox(
+                            height: modelWindowSize,
+                            width: modelWindowSize,
+                            child: const ModelViewer(
+                              backgroundColor: Colors.transparent,
+                              src: 'assets/3d_models/solar_tracker_model.gltf',
+                              alt: '3D Model',
+                              autoRotate: true,
+                              disableZoom: false,
+                              loading: Loading.eager,
+                              reveal: Reveal.auto,
+                              cameraControls: true,
+                              autoPlay: true,
+                            ),
+                          ),
+                        )
+                      : GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _show3DModel = !_show3DModel;
+                            });
+                          },
+                          child: Icon(
+                            Icons.threed_rotation_rounded,
+                            size: 0.8 * modelWindowSize,
+                            color: Colors.grey,
+                          ),
+                        ),
                 ),
+                SizedBox(height: intrinsicDeviceHeight * 0.01),
                 OutlinedButton(
                   onPressed: () {
                     setState(() {
@@ -158,11 +206,19 @@ class _DashboardState extends State<Dashboard> {
                   },
                   child: Text(_show3DModel ? "Hide 3D Model" : "Show 3D Model"),
                 ),
-                const SizedBox(height: 75),
+                SizedBox(height: intrinsicDeviceHeight * 0.01),
+                Container(
+                    height: 1,
+                    width: intrinsicDeviceWidth * 0.8,
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(10),
+                    )),
+                SizedBox(height: intrinsicDeviceHeight * 0.01),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
-                    width: _size * 4,
+                    width: modelWindowSize,
                     decoration: BoxDecoration(
                       border: Border.all(width: 1),
                       borderRadius: BorderRadius.circular(10),
@@ -170,18 +226,19 @@ class _DashboardState extends State<Dashboard> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
+                        SizedBox(width: intrinsicDeviceWidth * 0.03),
                         KnobWheel(
                             controller: _bodyKnobController,
-                            size: _size,
+                            size: knobSize,
                             style: style,
                             label: 'Body Knob Value: ${_bodyKnobValue.toString()}'),
-                        const SizedBox(width: _minHorizontalSeparation),
+                        const SizedBox(width: minHorizontalSeparation),
                         //  vertical line
                         Column(
                           children: [
                             Container(
                               width: 1,
-                              height: _size,
+                              height: knobSize,
                               color: Colors.black,
                             ),
                             MyToggleSwitch(
@@ -193,17 +250,22 @@ class _DashboardState extends State<Dashboard> {
                                 });
                               },
                             ),
-                            const Text("Current Mode")
+                             Text("Current Mode",
+                                style: TextStyle(
+                                  fontSize: intrinsicDeviceWidth * 0.02,
+                                  fontWeight: FontWeight.bold,
+                                ),),
                           ],
                         ),
-                        const SizedBox(width: _minHorizontalSeparation),
+                        const SizedBox(width: minHorizontalSeparation),
 
                         KnobWheel(
                           controller: _armKnobController,
-                          size: _size,
+                          size: knobSize,
                           style: style,
                           label: 'Arm Knob Value: ${_armKnobValue.toString()}',
                         ),
+                        SizedBox(width: intrinsicDeviceWidth * 0.03),
                       ],
                     ),
                   ),

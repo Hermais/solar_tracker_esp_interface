@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Knob Demo',
+      title: 'Solar Tracker Interface',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       home: BlocConsumer<AuthCubit, AuthState>(
@@ -46,7 +46,7 @@ class MyApp extends StatelessWidget {
         },
         builder: (context, state) {
           if (state is AuthLoaded) {
-            return const Dashboard(title: 'Flutter Knob Demo');
+            return const Dashboard(title: 'Solar Tracker Interface');
           }
           return const Splash();
         },

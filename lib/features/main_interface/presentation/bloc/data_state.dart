@@ -21,7 +21,7 @@ final class DataFetchLoaded extends DataState {
 final class DataFetchError extends DataState {
   final String error;
 
-  DataFetchError(this.error);
+  DataFetchError({required this.error});
 }
 
 final class DataSendLoading extends DataState {}

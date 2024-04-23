@@ -53,7 +53,7 @@ class DataCubit extends Cubit<DataState> {
 
     } catch (e) {
       print(e);
-      emit(DataFetchError(e.toString()));
+      emit(DataFetchError(error: e.toString()));
     }
   }
 

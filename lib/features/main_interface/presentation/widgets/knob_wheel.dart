@@ -40,11 +40,12 @@ class KnobWheel extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(3.0),
             child: Text(
-              label ?? "",
+              label ,
               style: Theme.of(context)
                   .textTheme
                   .bodySmall
-                  ?.copyWith(color: Theme.of(context).primaryColor),
+                  ?.copyWith(color: Theme.of(context).primaryColor
+              , fontSize: MediaQuery.of(context).size.width * 0.02),
             ),
           ),
         ),
