@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:knob_widget/knob_widget.dart';
+import 'package:solar_tracker_esp_interface/features/main_interface/presentation/bloc/network_cubit.dart';
 import 'package:solar_tracker_esp_interface/features/main_interface/presentation/widgets/switch.dart';
 import '../bloc/data_cubit.dart';
 import '../widgets/knob_wheel.dart';
@@ -250,11 +251,13 @@ class _DashboardState extends State<Dashboard> {
                                 });
                               },
                             ),
-                             Text("Current Mode",
-                                style: TextStyle(
-                                  fontSize: intrinsicDeviceWidth * 0.02,
-                                  fontWeight: FontWeight.bold,
-                                ),),
+                            Text(
+                              "Current Mode",
+                              style: TextStyle(
+                                fontSize: intrinsicDeviceWidth * 0.02,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(width: minHorizontalSeparation),
@@ -270,11 +273,18 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-                OutlinedButton(
-                  onPressed: () {
-                    BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                BlocBuilder<DataCubit, DataState>(
+                  builder: (context, state) {
+                    if(state is DataFetchLoading){
+                      return const CircularProgressIndicator();
+                    }
+                    return OutlinedButton(
+                      onPressed: () {
+                        BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                      },
+                      child: const Text("Update From Server"),
+                    );
                   },
-                  child: const Text("Update From Server"),
                 ),
               ],
             ),
