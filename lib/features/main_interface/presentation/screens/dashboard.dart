@@ -1,14 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:knob_widget/knob_widget.dart';
-import 'package:solar_tracker_esp_interface/features/main_interface/presentation/bloc/network_cubit.dart';
+import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:solar_tracker_esp_interface/features/main_interface/presentation/widgets/switch.dart';
+
 import '../bloc/data_cubit.dart';
 import '../widgets/knob_wheel.dart';
-import 'package:model_viewer_plus/model_viewer_plus.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 const _precisionDecimalDigits = 0;
 const _startAngle = -45.0;
@@ -27,10 +24,10 @@ class Dashboard extends StatefulWidget {
   final String title;
 
   @override
-  _DashboardState createState() => _DashboardState();
+  DashboardState createState() => DashboardState();
 }
 
-class _DashboardState extends State<Dashboard> {
+class DashboardState extends State<Dashboard> {
   bool _show3DModel = false;
 
   late KnobController _bodyKnobController;
@@ -115,22 +112,32 @@ class _DashboardState extends State<Dashboard> {
       ),
       body: BlocListener<DataCubit, DataState>(
         listener: (context, state) {
-          if (state is DataFetchLoaded) {
+          if (state is DataSendError || state is DataFetchError) {
+            ScaffoldMessenger.of(context)
+              ..hideCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(
+                  content: Text('Error fetching or sending data from server!'),
+                  elevation: 10,
+                  backgroundColor: Colors.red,
+                ),
+              );
+          } else if (state is DataFetchLoaded) {
             print("Data is loaded! Setting the Knob values.");
 
             try {
               _armKnobController.setCurrentValue(double.parse(
-                (state).data!['VerticalAngle'].toString(),
+                (state).data.verticalAngle.toString(),
               ));
               _bodyKnobController.setCurrentValue(double.parse(
-                (state).data!['HorizontalAngle'].toString(),
+                (state).data.horizontalAngle.toString(),
               ));
               setState(() {
-                _isModeSwitched = (state).data!['Mode'];
+                _isModeSwitched = (state).data.mode;
               });
             } catch (e) {
               print("Error setting knob values: $e");
-              context.read<DataCubit>().emit(DataFetchError(error: e.toString()));
+              context.read<DataCubit>().forceFailure();
             }
             ScaffoldMessenger.of(context)
               ..hideCurrentSnackBar()
@@ -273,9 +280,110 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
+                SizedBox(height: intrinsicDeviceHeight * 0.01),
+                Container(
+                  width: modelWindowSize,
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(6.0),
+                          child: Row(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Icon(
+                                  Icons.solar_power,
+                                  size: modelWindowSize * 0.1,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Text("Solar Panel Data",
+                                  style: TextStyle(
+                                    fontSize: modelWindowSize * 0.05,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  )),
+                            ],
+                          ),
+                        ),
+                        const Divider(
+                          color: Colors.black,
+                          thickness: 1,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: IntrinsicHeight(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Icon(Icons.electric_bolt, size: modelWindowSize * 0.05),
+                                const SizedBox(width: 10),
+                                Text("Solar Panel Voltage: ",
+                                    style: TextStyle(
+                                      fontSize: modelWindowSize * 0.03,
+                                      fontWeight: FontWeight.bold,
+                                    )),
+                                BlocBuilder<DataCubit, DataState>(
+                                  builder: (context, state) {
+                                    if (state is DataFetchLoaded) {
+                                      return Text(
+                                        (state).data.cellVoltage.toString(),
+                                        style: TextStyle(
+                                          fontSize: modelWindowSize * 0.03,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      );
+                                    }
+                                    return const CircularProgressIndicator();
+                                  },
+                                ),
+                                const VerticalDivider(
+                                  color: Colors.black,
+                                  thickness: 1,
+                                  width: 10,
+                                ),
+                                Icon(Icons.battery_4_bar_outlined,
+                                    size: modelWindowSize * 0.05),
+                                const SizedBox(width: 10),
+                                Text("Solar Panel Current: ",
+                                    style: TextStyle(
+                                      fontSize: modelWindowSize * 0.03,
+                                      fontWeight: FontWeight.bold,
+                                    )),
+                                BlocBuilder<DataCubit, DataState>(
+                                  builder: (context, state) {
+                                    if (state is DataFetchLoaded) {
+                                      return Text(
+                                        (state).data.cellCurrent.toString(),
+                                        style: TextStyle(
+                                          fontSize: modelWindowSize * 0.03,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.green,
+                                        ),
+                                      );
+                                    }
+                                    return const CircularProgressIndicator();
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: intrinsicDeviceHeight * 0.01),
                 BlocBuilder<DataCubit, DataState>(
                   builder: (context, state) {
-                    if(state is DataFetchLoading){
+                    if (state is DataFetchLoading) {
                       return const CircularProgressIndicator();
                     }
                     return OutlinedButton(
@@ -286,6 +394,7 @@ class _DashboardState extends State<Dashboard> {
                     );
                   },
                 ),
+                SizedBox(height: intrinsicDeviceHeight * 0.1),
               ],
             ),
           ),

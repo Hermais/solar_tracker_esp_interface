@@ -35,6 +35,18 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
+  flutter_lints: ^3.0.0
+  knob_widget:
+  model_viewer_plus:
+  babylonjs_viewer:
+  flutter_inappwebview:
+  flutter_bloc: ^8.1.5
+  get_it:
+  flutter_launcher_icons:
+  firebase_core:
+  firebase_database:
+  firebase_auth:
+  connectivity_plus:
 
 dev_dependencies:
   flutter_test:
@@ -45,18 +57,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^3.0.0
-  knob_widget:
-  model_viewer_plus:
-  babylonjs_viewer:
-  flutter_inappwebview:
-  flutter_bloc:
-  get_it:
-  flutter_launcher_icons:
-  firebase_core:
-  firebase_database:
-  firebase_auth:
-  connectivity_plus: 
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

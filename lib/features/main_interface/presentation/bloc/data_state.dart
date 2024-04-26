@@ -8,13 +8,10 @@ final class DataInitial extends DataState {}
 final class DataFetchLoading extends DataState {}
 
 final class DataFetchLoaded extends DataState {
-  final double? horizontalAngle;
-  final double? verticalAngle;
-  final Map<String, dynamic>? data;
+  final ESPData data;
 
 
-  DataFetchLoaded({this.horizontalAngle, this.verticalAngle, this.data});
-
+  DataFetchLoaded({required this.data});
 
 }
 
@@ -24,15 +21,8 @@ final class DataFetchError extends DataState {
   DataFetchError({required this.error});
 }
 
-final class DataSendLoading extends DataState {}
-
-
-final class DataSendLoaded extends DataState {
-
-}
-
 final class DataSendError extends DataState {
   final String error;
 
-  DataSendError(this.error);
+  DataSendError({required this.error});
 }

@@ -42,7 +42,7 @@ packages:
     source: hosted
     version: "2.11.0"
   babylonjs_viewer:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: babylonjs_viewer
       sha256: "0e978b8597203bd48180a29cbec3c9773d64864e9bf8376a5de9a1104a44c19a"
@@ -106,7 +106,7 @@ packages:
     source: hosted
     version: "1.18.0"
   connectivity_plus:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: connectivity_plus
       sha256: db7a4e143dc72cc3cb2044ef9b052a7ebfe729513e6a82943bc3526f784365b8
@@ -170,7 +170,7 @@ packages:
     source: hosted
     version: "2.1.2"
   firebase_auth:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_auth
       sha256: a35269247d7b23703bab35ecdb50462944ac1fcdfcf359a7071506c4ad830bfb
@@ -194,7 +194,7 @@ packages:
     source: hosted
     version: "5.11.2"
   firebase_core:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_core
       sha256: "6b1152a5af3b1cfe7e45309e96fc1aa14873f410f7aadb3878aa7812acfa7531"
@@ -218,7 +218,7 @@ packages:
     source: hosted
     version: "2.15.0"
   firebase_database:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_database
       sha256: f70072c5ad104c586f6ff08e7824c98f7fff6277debcef208871f6bdde5572e3
@@ -247,7 +247,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_bloc:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_bloc
       sha256: f0ecf6e6eb955193ca60af2d5ca39565a86b8a142452c5b24d96fb477428f4d2
@@ -255,7 +255,7 @@ packages:
     source: hosted
     version: "8.1.5"
   flutter_inappwebview:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_inappwebview
       sha256: d198297060d116b94048301ee6749cd2e7d03c1f2689783f52d210a6b7aba350
@@ -263,7 +263,7 @@ packages:
     source: hosted
     version: "5.8.0"
   flutter_launcher_icons:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_launcher_icons
       sha256: "526faf84284b86a4cb36d20a5e45147747b7563d921373d4ee0559c54fcdbcea"
@@ -271,7 +271,7 @@ packages:
     source: hosted
     version: "0.13.1"
   flutter_lints:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: flutter_lints
       sha256: "9e8c3858111da373efc5aa341de011d9bd23e2c5c5e0c62bccf32438e192d7b1"
@@ -289,7 +289,7 @@ packages:
     source: sdk
     version: "0.0.0"
   get_it:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: get_it
       sha256: d85128a5dae4ea777324730dc65edd9c9f43155c109d5cc0a69cab74139fbac1
@@ -329,7 +329,7 @@ packages:
     source: hosted
     version: "4.8.1"
   knob_widget:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: knob_widget
       sha256: a2c807e8d4e0bad25f5ece870e5379e6ce047ba7be3bf711bfb44ab1cd6a9e78
@@ -393,7 +393,7 @@ packages:
     source: hosted
     version: "1.11.0"
   model_viewer_plus:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: model_viewer_plus
       sha256: "633efbd081efe9af8b149c5553fa1e3e83a298ccc151955b0fe9d56a666943be"
