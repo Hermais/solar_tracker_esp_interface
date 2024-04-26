@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
               ..showSnackBar(
                 const SnackBar(
                   content: Text('No Internet Connection'),
-                  duration: Duration(seconds: 30),
+                  duration: Duration(seconds: 1),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
               ..showSnackBar(
                 const SnackBar(
                   content: Text('Internet Connection Restored!'),
-                  duration: Duration(seconds: 2),
+                  duration: Duration(seconds: 1),
                   backgroundColor: Colors.green,
                 ),
               );

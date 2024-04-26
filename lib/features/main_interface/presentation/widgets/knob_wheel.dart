@@ -29,14 +29,10 @@ class KnobWheel extends StatelessWidget {
           style: style,
         ),
         const SizedBox(
-          height: 10,
+          height: 15,
         ),
         Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(width: 0.5),
-            borderRadius: BorderRadius.circular(10),
-          ),
+
           child: Padding(
             padding: const EdgeInsets.all(3.0),
             child: Text(
