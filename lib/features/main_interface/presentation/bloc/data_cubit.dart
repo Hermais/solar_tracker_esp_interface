@@ -12,6 +12,9 @@ class DataCubit extends Cubit<DataState> {
     try {
       await FirebaseDatabase.instance.ref('/ESP/HorizontalAngle').set(angle.toInt());
     } catch (e) {
+
+      print("Set Horizontal Angle Error: $e");
+
       emit(DataSendError(error: e.toString()));
     }
   }
@@ -20,6 +23,8 @@ class DataCubit extends Cubit<DataState> {
     try {
       await FirebaseDatabase.instance.ref('/ESP/VerticalAngle').set(angle.toInt());
     } catch (e) {
+
+      print("Set Vertical Angle Error: $e");
       emit(DataSendError(error: e.toString()));
 
     }
@@ -37,17 +42,17 @@ class DataCubit extends Cubit<DataState> {
 
   void getDataSnapshot() async {
     emit(DataFetchLoading());
-    try {
+    //try {
       final event = await FirebaseDatabase.instance.ref('/ESP').once();
       emit(DataFetchLoaded(
           data: ESPData.fromMap(
         Map<String, dynamic>.from(event.snapshot.value as Map<dynamic, dynamic>),
       )));
       print("Success. ESPData: ${(state as DataFetchLoaded).data}");
-    } catch (e) {
-      print(e);
-      emit(DataFetchError(error: e.toString()));
-    }
+    //} catch (e) {
+      //print("getDataSnapShot Error: $e");
+      //emit(DataFetchError(error: e.toString()));
+    //}
   }
 
   void forceFailure(){
@@ -72,11 +77,11 @@ class ESPData {
 
   factory ESPData.fromMap(Map<String, dynamic> map) {
     return ESPData(
-      horizontalAngle: map['HorizontalAngle'],
-      verticalAngle: map['VerticalAngle'],
+      horizontalAngle: double.parse(map['HorizontalAngle'].toString()),
+      verticalAngle: double.parse(map['VerticalAngle'].toString()),
       mode: map['Mode'],
-      cellCurrent: map['CellCurrent'],
-      cellVoltage: map['CellVoltage'],
+      cellCurrent: double.parse(map['CellCurrent'].toString()),
+      cellVoltage: double.parse(map['CellVoltage'].toString()),
     );
   }
 
