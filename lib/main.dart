@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Solar Tracker Interface',
       theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
+      darkTheme: ThemeData.light(),
       home: BlocConsumer<NetworkCubit, NetworkState>(
         listener: (context, state) {
           if (state is NetworkDisconnected) {
