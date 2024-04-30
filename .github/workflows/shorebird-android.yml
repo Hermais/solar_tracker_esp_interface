@@ -34,8 +34,11 @@ jobs:
       - name: 🚀 Shorebird Patch
         if: ${{ !github.event.created }}
         uses: shorebirdtech/shorebird-patch@v0
+        env:
+          SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         with:
           platform: android
+
 
       - name: Upload APK as Artifact
         uses: actions/upload-artifact@v2
