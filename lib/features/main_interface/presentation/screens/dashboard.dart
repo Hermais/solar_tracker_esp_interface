@@ -323,10 +323,12 @@ class DashboardState extends State<Dashboard> {
                           },
                         ),
                         Text(
-                          "Current Mode",
+                          "Current Mode: ${_isModeSwitched ? "Auto" : "Manual"}",
                           style: TextStyle(
                             fontSize: intrinsicDeviceWidth * 0.025,
                             fontWeight: FontWeight.bold,
+                            color: Theme.of(context).primaryColor,
+
                           ),
                         ),
                       ],
@@ -379,6 +381,7 @@ class DashboardState extends State<Dashboard> {
                                     style: TextStyle(
                                       fontSize: knobsBoxSize * 0.02,
                                       fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
                                     )),
                                 BlocBuilder<DataCubit, DataState>(
                                   builder: (context, state) {
@@ -407,6 +410,7 @@ class DashboardState extends State<Dashboard> {
                                     style: TextStyle(
                                       fontSize: knobsBoxSize * 0.02,
                                       fontWeight: FontWeight.bold,
+                                      color: Theme.of(context).primaryColor,
                                     )),
                                 BlocBuilder<DataCubit, DataState>(
                                   builder: (context, state) {
