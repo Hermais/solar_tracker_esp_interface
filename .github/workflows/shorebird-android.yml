@@ -6,7 +6,8 @@ on:
       - master
 
 env:
-  SHOREBIRD_API_KEY: ${{ secrets.SHOREBIRD_API_KEY_ }}
+  SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
+
 
 jobs:
   shorebird_android:
