@@ -1,0 +1,46 @@
+name: Shorebird Android
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  SHOREBIRD_API_KEY: ${{ secrets.SHOREBIRD_API_KEY_ }}
+
+jobs:
+  shorebird_android:
+    defaults:
+      run:
+        shell: bash
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v3
+
+      - name: 🐦 Setup Shorebird
+        uses: shorebirdtech/setup-shorebird@v1
+
+      - name: 🚀 Shorebird Release
+        if: ${{ github.event.created }}
+        uses: shorebirdtech/shorebird-release@v0
+        with:
+          args: -- artifact apk  -- --no-tree-shake-icons
+          platform: android
+
+      - name: 🚀 Shorebird Patch
+        if: ${{ !github.event.created }}
+        uses: shorebirdtech/shorebird-patch@v0
+        with:
+          platform: android
+
+      - name: Upload APK as Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+
+

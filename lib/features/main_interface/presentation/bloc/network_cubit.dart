@@ -42,7 +42,7 @@ class NetworkCubit extends Cubit<NetworkState> {
   Future<void> _updateConnectionStatus(List<ConnectivityResult> result) async {
     _connectionStatus = result;
 
-    print("Called to check connection. ${_connectionStatus}");
+    print("Called to check connection. $_connectionStatus");
     if (_connectionStatus.contains(ConnectivityResult.none) ) {
       emit(NetworkDisconnected());
     } else {

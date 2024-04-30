@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:knob_widget/knob_widget.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
+import 'package:solar_tracker_esp_interface/features/main_interface/presentation/widgets/safe_icon.dart';
 import 'package:solar_tracker_esp_interface/features/main_interface/presentation/widgets/switch.dart';
 
 import '../../../../core/constants.dart';
@@ -115,6 +116,15 @@ class DashboardState extends State<Dashboard> {
       appBar: AppBar(
         title: Text(widget.title),
         centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              BlocProvider.of<DataCubit>(context).getDataSnapshot();
+            },
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Data',
+          ),
+        ],
       ),
       body: BlocListener<DataCubit, DataState>(
         listener: (context, state) {
@@ -176,52 +186,62 @@ class DashboardState extends State<Dashboard> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Model window
-                Container(
-                  width: modelWindowSize,
-                  height: modelWindowSize,
-                  decoration: borderDecorations,
-                  child: _show3DModel
-                      ? Visibility(
-                          visible: _show3DModel,
-                          child: SizedBox(
-                            height: modelWindowSize,
-                            width: modelWindowSize,
-                            child: const ModelViewer(
-                              backgroundColor: Colors.transparent,
-                              src: 'assets/3d_models/solar_tracker_model.gltf',
-                              alt: '3D Model',
-                              autoRotate: true,
-                              disableZoom: false,
-                              loading: Loading.eager,
-                              reveal: Reveal.auto,
-                              cameraControls: true,
-                              autoPlay: true,
-                            ),
-                          ),
-                        )
-                      : GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _show3DModel = !_show3DModel;
-                            });
-                          },
-                          child: Icon(
-                            Icons.threed_rotation_rounded,
-                            size: 0.8 * modelWindowSize,
-                            color: Colors.grey,
-                          ),
+                SizedBox(
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: modelWindowSize,
+                        height: modelWindowSize,
+                        decoration: borderDecorations,
+                        child: _show3DModel
+                            ? Visibility(
+                                visible: _show3DModel,
+                                child: SizedBox(
+                                  height: modelWindowSize,
+                                  width: modelWindowSize,
+                                  child: const ModelViewer(
+                                    backgroundColor: Colors.transparent,
+                                    src: 'assets/3d_models/solar_tracker_model.gltf',
+                                    alt: '3D Model',
+                                    autoRotate: true,
+                                    disableZoom: false,
+                                    loading: Loading.eager,
+                                    reveal: Reveal.auto,
+                                    cameraControls: true,
+                                    autoPlay: true,
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _show3DModel = !_show3DModel;
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.threed_rotation_rounded,
+                                  size: 0.8 * modelWindowSize,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                      ),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _show3DModel = !_show3DModel;
+                          });
+                        },
+                        icon: SafeIcon(
+                          icon: _show3DModel ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
                         ),
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
+
                 // Show model button
-                OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      _show3DModel = !_show3DModel;
-                    });
-                  },
-                  child: Text(_show3DModel ? "Hide 3D Model" : "Show 3D Model"),
-                ),
+
                 SizedBox(height: intrinsicDeviceHeight * 0.01),
                 // Custom line divider
                 Container(
@@ -253,8 +273,7 @@ class DashboardState extends State<Dashboard> {
                       child: Container(
                         width: knobsBoxSize,
                         decoration: borderDecorations.copyWith(
-                          color:
-                              _isKnobBeingInteractedWith ? Colors.grey[300] : null,
+                          color: _isKnobBeingInteractedWith ? Colors.grey[300] : null,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
