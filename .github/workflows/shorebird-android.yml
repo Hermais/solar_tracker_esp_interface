@@ -28,6 +28,9 @@ jobs:
       - name: 🚀 Use Shorebird
         run: shorebird --version
 
+      - name: Check Shorebird
+        run: shorebird doctor
+
 
 #      - name: 🚀 Shorebird Release
 #        if: ${{ github.event.created }}
