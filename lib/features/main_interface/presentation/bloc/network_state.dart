@@ -1,5 +1,5 @@
 part of 'network_cubit.dart';
-
+/// h
 @immutable
 sealed class NetworkState {}
 
