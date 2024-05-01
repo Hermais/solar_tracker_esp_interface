@@ -109,6 +109,7 @@ class DashboardState extends State<Dashboard> {
 
     var modelWindowSize = intrinsicDeviceWidth * 0.5;
     var knobsBoxSize = intrinsicDeviceWidth * 0.95;
+    var dataFontSize = knobsBoxSize * 0.025;
 
     const minHorizontalSeparation = 5.0;
 
@@ -117,12 +118,16 @@ class DashboardState extends State<Dashboard> {
         title: Text(widget.title),
         centerTitle: true,
         actions: [
-          IconButton(
-            onPressed: () {
-              BlocProvider.of<DataCubit>(context).getDataSnapshot();
+          BlocBuilder<DataCubit, DataState>(
+            builder: (context, state) {
+              return (state is DataFetchLoading) ? const CircularProgressIndicator():IconButton(
+                onPressed: () {
+                  BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                },
+                icon: const Icon(Icons.cloud_download_outlined),
+                tooltip: 'Refresh Data',
+              );
             },
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh Data',
           ),
         ],
       ),
@@ -255,16 +260,7 @@ class DashboardState extends State<Dashboard> {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GestureDetector(
-                      // onTapDown: (_) {
-                      //   setState(() {
-                      //     _isKnobBeingInteractedWith = true;
-                      //   });
-                      // },
-                      // onTapUp: (_) {
-                      //   setState(() {
-                      //     _isKnobBeingInteractedWith = false;
-                      //   });
-                      // },
+
                       onTap: () {
                         setState(() {
                           _isKnobBeingInteractedWith = !_isKnobBeingInteractedWith;
@@ -275,30 +271,73 @@ class DashboardState extends State<Dashboard> {
                         decoration: borderDecorations.copyWith(
                           color: _isKnobBeingInteractedWith ? Colors.grey[300] : null,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(width: intrinsicDeviceWidth * 0.03),
-                            KnobWheel(
-                                controller: _bodyKnobController,
-                                size: knobSize,
-                                style: style,
-                                label: 'Body Knob Value: ${_bodyKnobValue.toString()}'),
-                            const SizedBox(width: minHorizontalSeparation),
-                            VerticalDivider(
-                              color: lineColor,
-                              thickness: 1,
-                              width: 10,
-                            ),
-                            const SizedBox(width: minHorizontalSeparation),
-                            KnobWheel(
-                              controller: _armKnobController,
-                              size: knobSize,
-                              style: style,
-                              label: 'Arm Knob Value: ${_armKnobValue.toString()}',
-                            ),
-                            SizedBox(width: intrinsicDeviceWidth * 0.03),
-                          ],
+                        child: IntrinsicHeight(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Column(
+                                children: [
+                                  SizedBox(width: intrinsicDeviceWidth * 0.03),
+                                  KnobWheel(
+                                      controller: _bodyKnobController,
+                                      size: knobSize,
+                                      style: style,
+                                      label: 'Body Knob Value: ${_bodyKnobValue.toString()}'),
+                                  const SizedBox(width: minHorizontalSeparation),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  /// Mode switch box
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 3.0,
+                                    ),
+                                    child: Container(
+                                      decoration: borderDecorations,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(1.0),
+                                        child: Column(
+                                          children: [
+                                            MyToggleSwitch(
+                                              isSwitched: _isModeSwitched,
+                                              onChanged: (val) {
+                                                context.read<DataCubit>().setMode(val);
+                                                setState(() {
+                                                  _isModeSwitched = val;
+                                                });
+                                              },
+                                            ),
+                                            Text(
+                                              _isModeSwitched ? "Auto" : "Manual",
+                                              style: TextStyle(
+                                                fontSize: dataFontSize,
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context).primaryColor,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                ],
+                              ),
+                              Column(
+                                children: [
+                                  KnobWheel(
+                                    controller: _armKnobController,
+                                    size: knobSize,
+                                    style: style,
+                                    label: 'Arm Knob Value: ${_armKnobValue.toString()}',
+                                  ),
+                                  SizedBox(width: intrinsicDeviceWidth * 0.03),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -306,46 +345,21 @@ class DashboardState extends State<Dashboard> {
                 ),
                 SizedBox(height: intrinsicDeviceHeight * 0.01),
 
-                /// Mode switch box
-                Container(
-                  decoration: borderDecorations,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        MyToggleSwitch(
-                          isSwitched: _isModeSwitched,
-                          onChanged: (val) {
-                            context.read<DataCubit>().setMode(val);
-                            setState(() {
-                              _isModeSwitched = val;
-                            });
-                          },
-                        ),
-                        Text(
-                          "Current Mode: ${_isModeSwitched ? "Auto" : "Manual"}",
-                          style: TextStyle(
-                            fontSize: intrinsicDeviceWidth * 0.025,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).primaryColor,
 
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
                 // Solar panel box
                 Container(
                   width: knobsBoxSize,
                   decoration: borderDecorations,
                   child: IntrinsicHeight(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.only(
+                            top: 8.0,
+                          ),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Align(
                                 alignment: Alignment.centerLeft,
@@ -369,17 +383,18 @@ class DashboardState extends State<Dashboard> {
                           color: lineColor,
                           thickness: 1,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: IntrinsicHeight(
+                        IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              bottom: 8.0,
+                            ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 Icon(Icons.electric_bolt, size: knobsBoxSize * 0.04),
-                                SizedBox(width: knobsBoxSize * 0.02),
                                 Text("Solar Panel Voltage: ",
                                     style: TextStyle(
-                                      fontSize: knobsBoxSize * 0.02,
+                                      fontSize: dataFontSize,
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).primaryColor,
                                     )),
@@ -389,7 +404,7 @@ class DashboardState extends State<Dashboard> {
                                       return Text(
                                         (state).data.cellVoltage.toStringAsFixed(3),
                                         style: TextStyle(
-                                          fontSize: knobsBoxSize * 0.02,
+                                          fontSize: dataFontSize,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.green,
                                         ),
@@ -405,10 +420,9 @@ class DashboardState extends State<Dashboard> {
                                 ),
                                 Icon(Icons.battery_4_bar_outlined,
                                     size: knobsBoxSize * 0.04),
-                                SizedBox(width: knobsBoxSize * 0.02),
                                 Text("Solar Panel Current: ",
                                     style: TextStyle(
-                                      fontSize: knobsBoxSize * 0.02,
+                                      fontSize: dataFontSize,
                                       fontWeight: FontWeight.bold,
                                       color: Theme.of(context).primaryColor,
                                     )),
@@ -418,7 +432,7 @@ class DashboardState extends State<Dashboard> {
                                       return Text(
                                         (state).data.cellCurrent.toStringAsFixed(3),
                                         style: TextStyle(
-                                          fontSize: knobsBoxSize * 0.02,
+                                          fontSize: dataFontSize,
                                           fontWeight: FontWeight.bold,
                                           color: Colors.green,
                                         ),
@@ -437,19 +451,19 @@ class DashboardState extends State<Dashboard> {
                 ),
                 SizedBox(height: intrinsicDeviceHeight * 0.01),
                 // Update from server button.
-                BlocBuilder<DataCubit, DataState>(
-                  builder: (context, state) {
-                    if (state is DataFetchLoading) {
-                      return const CircularProgressIndicator();
-                    }
-                    return OutlinedButton(
-                      onPressed: () {
-                        BlocProvider.of<DataCubit>(context).getDataSnapshot();
-                      },
-                      child: const Text("Update From Server"),
-                    );
-                  },
-                ),
+                // BlocBuilder<DataCubit, DataState>(
+                //   builder: (context, state) {
+                //     if (state is DataFetchLoading) {
+                //       return const CircularProgressIndicator();
+                //     }
+                //     return OutlinedButton(
+                //       onPressed: () {
+                //         BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                //       },
+                //       child: const Text("Update From Server"),
+                //     );
+                //   },
+                // ),
                 SizedBox(height: intrinsicDeviceHeight * 0.05),
               ],
             ),
