@@ -24,6 +24,11 @@ jobs:
       - name: 🐦 Setup Shorebird
         uses: shorebirdtech/setup-shorebird@v1
 
+
+      - name: 🚀 Use Shorebird
+        run: shorebird --version
+
+
 #      - name: 🚀 Shorebird Release
 #        if: ${{ github.event.created }}
 #        uses: shorebirdtech/shorebird-release@v0
@@ -32,7 +37,6 @@ jobs:
 #          platform: android
 
       - name: 🚀 Shorebird Patch
-        if: ${{ !github.event.created }}
         uses: shorebirdtech/shorebird-patch@v0
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
