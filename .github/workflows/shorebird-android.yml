@@ -20,6 +20,16 @@ jobs:
     steps:
       - name: base64 Token
         run:  echo $SHOREBIRD_TOKEN | base64 --decode
+
+      - name: Check for Secret availability
+        id: secret-check
+        run: |
+          if [ "${{ secrets.SHOREBIRD_TOKEN }}" != '' ]; then
+            echo "SHOREBIRD_TOKEN is available"
+          else
+            echo "SHOREBIRD_TOKEN is not available or is empty"
+          fi
+
       
       - name: 📚 Git Checkout
         uses: actions/checkout@v3
