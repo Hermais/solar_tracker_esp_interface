@@ -18,6 +18,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: base64 Token
+      - run: echo $SHOREBIRD_TOKEN | base64 --decode
+      
       - name: 📚 Git Checkout
         uses: actions/checkout@v3
 
