@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: base64 Token
-        run:  echo $'SHOREBIRD_TOKEN' | base64 --decode --ignore-garbage -w 0
+        run:  echo $SHOREBIRD_TOKEN
       
       - name: 📚 Git Checkout
         uses: actions/checkout@v3
