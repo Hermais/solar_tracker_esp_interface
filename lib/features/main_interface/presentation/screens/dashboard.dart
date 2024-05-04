@@ -107,9 +107,9 @@ class DashboardState extends State<Dashboard> {
     final intrinsicDeviceWidth = MediaQuery.of(context).size.width;
     final intrinsicDeviceHeight = MediaQuery.of(context).size.height;
 
-    var modelWindowSize = intrinsicDeviceWidth * 0.5;
-    var knobsBoxSize = intrinsicDeviceWidth * 0.95;
-    var dataFontSize = knobsBoxSize * 0.025;
+    var modelWindowHeight = intrinsicDeviceWidth * 0.5;
+    var containersWidth = intrinsicDeviceWidth * 0.95;
+    var dataFontSize = containersWidth * 0.025;
 
     const minHorizontalSeparation = 5.0;
 
@@ -195,15 +195,15 @@ class DashboardState extends State<Dashboard> {
                   child: Stack(
                     children: [
                       Container(
-                        width: knobsBoxSize,
-                        height: modelWindowSize,
+                        height: modelWindowHeight,
+                        width: containersWidth,
                         decoration: borderDecorations,
                         child: _show3DModel
                             ? Visibility(
                                 visible: _show3DModel,
                                 child: SizedBox(
-                                  height: modelWindowSize,
-                                  width: modelWindowSize,
+                                  height: modelWindowHeight,
+                                  width: modelWindowHeight,
                                   child: const ModelViewer(
                                     backgroundColor: Colors.transparent,
                                     src: 'assets/3d_models/solar_tracker_model.gltf',
@@ -225,7 +225,7 @@ class DashboardState extends State<Dashboard> {
                                 },
                                 child: Icon(
                                   Icons.threed_rotation_rounded,
-                                  size: 0.8 * modelWindowSize,
+                                  size: 0.8 * modelWindowHeight,
                                   color: Colors.grey,
                                 ),
                               ),
@@ -248,13 +248,6 @@ class DashboardState extends State<Dashboard> {
                 // Show model button
 
                 SizedBox(height: intrinsicDeviceHeight * 0.01),
-                // Custom line divider
-                Container(
-                  height: 1,
-                  width: intrinsicDeviceWidth * 0.8,
-                  decoration: borderDecorations,
-                ),
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
                 // Knobs Box
                 IntrinsicHeight(
                   child: Padding(
@@ -267,7 +260,7 @@ class DashboardState extends State<Dashboard> {
                         });
                       },
                       child: Container(
-                        width: knobsBoxSize,
+                        width: containersWidth,
                         decoration: borderDecorations.copyWith(
                           color: _isKnobBeingInteractedWith ? Colors.grey[300] : null,
                         ),
@@ -348,7 +341,7 @@ class DashboardState extends State<Dashboard> {
 
                 // Solar panel box
                 Container(
-                  width: knobsBoxSize,
+                  width: containersWidth,
                   decoration: borderDecorations,
                   child: IntrinsicHeight(
                     child: Column(
@@ -365,14 +358,14 @@ class DashboardState extends State<Dashboard> {
                                 alignment: Alignment.centerLeft,
                                 child: Icon(
                                   Icons.solar_power,
-                                  size: knobsBoxSize * 0.1,
+                                  size: containersWidth * 0.1,
                                   color: Colors.grey,
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Text("Solar Panel Data",
                                   style: TextStyle(
-                                    fontSize: knobsBoxSize * 0.05,
+                                    fontSize: containersWidth * 0.05,
                                     fontWeight: FontWeight.bold,
                                     color: Theme.of(context).primaryColor,
                                   )),
@@ -391,7 +384,7 @@ class DashboardState extends State<Dashboard> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                Icon(Icons.electric_bolt, size: knobsBoxSize * 0.04),
+                                Icon(Icons.electric_bolt, size: containersWidth * 0.04),
                                 Text("Solar Panel Voltage: ",
                                     style: TextStyle(
                                       fontSize: dataFontSize,
@@ -419,7 +412,7 @@ class DashboardState extends State<Dashboard> {
                                   width: 10,
                                 ),
                                 Icon(Icons.battery_4_bar_outlined,
-                                    size: knobsBoxSize * 0.04),
+                                    size: containersWidth * 0.04),
                                 Text("Solar Panel Current: ",
                                     style: TextStyle(
                                       fontSize: dataFontSize,
