@@ -71,7 +71,7 @@ jobs:
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
         with:
-          args: -- --no-tree-shake-icons  --allow-asset-diffs
+          args:   --allow-asset-diffs -- --no-tree-shake-icons
           platform: android
 
 
