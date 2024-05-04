@@ -18,10 +18,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-#      - name: base64 Token
-#        run:  echo $SHOREBIRD_TOKEN | base64 --decode
-
-      - name: Check for Secret availability
+      - name: 🔐 Check for Secret availability
         id: secret-check
         run: |
           if [ "${{ secrets.SHOREBIRD_TOKEN }}" != '' ]; then
@@ -31,33 +28,20 @@ jobs:
           fi
 
 
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: 📚 Git Checkout
+        uses: actions/checkout@v4
+
+      - name: ☕ Setup Java 17
+        uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: '17'
 
-
-
-
-      - name: 📚 Git Checkout
-        uses: actions/checkout@v3
-
-      
-
-
-   
-
       - name: 🐦 Setup Shorebird
         uses: shorebirdtech/setup-shorebird@v1
 
-
       - name: 🚀 Use Shorebird
         run: shorebird --version
-
-      - name: Check Shorebird
-        run: shorebird doctor
-
 
 #      - name: 🚀 Shorebird Release
 #        if: ${{ github.event.created }}
@@ -66,7 +50,7 @@ jobs:
 #          args: -- artifact apk  -- --no-tree-shake-icons
 #          platform: android
 
-      - name: 🚀 Shorebird Patch
+      - name: 🩹 Shorebird Patch
         uses: shorebirdtech/shorebird-patch@v0
         env:
           SHOREBIRD_TOKEN: ${{ secrets.SHOREBIRD_TOKEN }}
@@ -74,12 +58,6 @@ jobs:
           args:   --allow-asset-diffs -- --no-tree-shake-icons
           platform: android
 
-
-      - name: Upload APK as Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
 
 
 
