@@ -195,7 +195,7 @@ class DashboardState extends State<Dashboard> {
                   child: Stack(
                     children: [
                       Container(
-                        width: modelWindowSize,
+                        width: knobsBoxSize,
                         height: modelWindowSize,
                         decoration: borderDecorations,
                         child: _show3DModel
