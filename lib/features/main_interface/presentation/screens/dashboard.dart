@@ -443,20 +443,6 @@ class DashboardState extends State<Dashboard> {
                   ),
                 ),
                 SizedBox(height: intrinsicDeviceHeight * 0.01),
-                // Update from server button.
-                // BlocBuilder<DataCubit, DataState>(
-                //   builder: (context, state) {
-                //     if (state is DataFetchLoading) {
-                //       return const CircularProgressIndicator();
-                //     }
-                //     return OutlinedButton(
-                //       onPressed: () {
-                //         BlocProvider.of<DataCubit>(context).getDataSnapshot();
-                //       },
-                //       child: const Text("Update From Server"),
-                //     );
-                //   },
-                // ),
                 SizedBox(height: intrinsicDeviceHeight * 0.05),
               ],
             ),

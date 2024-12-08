@@ -23,9 +23,10 @@ void main() async {
           create: (context) => sl<NetworkCubit>()..monitorInternetConnection(),
           lazy: false,
         )
-      ],
+      ],/**/
       child: MyApp(),
     ),
+
   );
 }
 
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Solar Tracker Interface',
       theme: ThemeData.light(),
       darkTheme: ThemeData.light(),
