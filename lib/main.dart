@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Solar Tracker Interface',
+      title: 'Solar Tracker Manual Control Interface',
       theme: ThemeData.light(),
       darkTheme: ThemeData.light(),
       home: BlocConsumer<NetworkCubit, NetworkState>(
@@ -81,7 +81,7 @@ class MyApp extends StatelessWidget {
               },
               builder: (context, state) {
                 if (state is AuthLoaded) {
-                  return const Dashboard(title: 'Solar Tracker Interface');
+                  return const Dashboard(title: 'Solar Tracker Manual Interface');
                 }
                 return const Splash();
               },

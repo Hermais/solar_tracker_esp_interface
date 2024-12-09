@@ -115,7 +115,9 @@ class DashboardState extends State<Dashboard> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(widget.title, style: TextStyle(
+          fontSize: 20.0
+        ),),
         centerTitle: true,
         actions: [
           BlocBuilder<DataCubit, DataState>(

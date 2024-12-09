@@ -44,3 +44,7 @@ app.*.map.json
 /lib/ignore/
 /lib/ignore/data/
 /lib/ignore/domain/
+/ignored_folder/app-release.aab
+/ignored_folder/bundletool.jar
+/ignored_folder/esp_server.py
+/ignored_folder/universal_esp_tracker.apk
