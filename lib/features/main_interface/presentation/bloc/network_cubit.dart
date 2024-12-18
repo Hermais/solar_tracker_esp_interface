@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/foundation.dart';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 
@@ -32,7 +32,7 @@ class NetworkCubit extends Cubit<NetworkState> {
     try {
       result = await connectivity.checkConnectivity();
     }  catch (e) {
-      print('Couldn\'t check connectivity status $e');
+      debugPrint('Could\'t check connectivity status $e');
       return;
     }
 

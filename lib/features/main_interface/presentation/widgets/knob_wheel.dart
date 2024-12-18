@@ -38,18 +38,15 @@ class KnobWheel extends StatelessWidget {
           const SizedBox(
             height: 15,
           ),
-          Container(
-
-            child: Padding(
-              padding: const EdgeInsets.all(3.0),
-              child: Text(
-                label ,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Theme.of(context).primaryColor
-                , fontSize: MediaQuery.of(context).size.width * 0.02),
-              ),
+          Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Text(
+              label ,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodySmall
+                  ?.copyWith(color: Theme.of(context).primaryColor
+              , fontSize: MediaQuery.of(context).size.width * 0.02),
             ),
           ),
           const SizedBox(

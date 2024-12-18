@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:knob_widget/knob_widget.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
@@ -89,12 +87,22 @@ class DashboardState extends State<Dashboard> {
     _armKnobController.addOnValueChangedListener(valueChangedListenerArmKnob);
   }
 
+  var modelWindowHeight, containersWidth, dataFontSize, knobSize, minHorizontalSeparation, style;
+  var intrinsicDeviceWidth, intrinsicDeviceHeight;
+
+  double getDeviceWidth(){
+    return MediaQuery.sizeOf(context).width;
+  }
+  double getDeviceHeight(){
+    return MediaQuery.sizeOf(context).height;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final KnobStyle style = KnobStyle(
+     style = KnobStyle(
       labelStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: Theme.of(context).primaryColor,
-            fontSize: MediaQuery.of(context).size.width * 0.02,
+            fontSize: getDeviceWidth() * 0.02,
           ),
       tickOffset: _tickOffset,
       labelOffset: _labelOffset,
@@ -102,33 +110,39 @@ class DashboardState extends State<Dashboard> {
       showMinorTickLabels: _showMinorTickLabels,
     );
 
-    var knobSize = MediaQuery.of(context).size.width / 4.5;
+     knobSize = getDeviceWidth() > 600 ?
+     getDeviceWidth() / 7.0:getDeviceWidth()/4.5;
 
-    final intrinsicDeviceWidth = MediaQuery.of(context).size.width;
-    final intrinsicDeviceHeight = MediaQuery.of(context).size.height;
+    intrinsicDeviceWidth = getDeviceWidth();
+    intrinsicDeviceHeight = getDeviceHeight();
 
-    var modelWindowHeight = intrinsicDeviceWidth * 0.5;
-    var containersWidth = intrinsicDeviceWidth * 0.95;
-    var dataFontSize = containersWidth * 0.025;
+    modelWindowHeight = intrinsicDeviceWidth * 0.5;
+    containersWidth = intrinsicDeviceWidth * 0.95;
+     dataFontSize = containersWidth * 0.025;
 
-    const minHorizontalSeparation = 5.0;
+     minHorizontalSeparation = 5.0;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title, style: TextStyle(
-          fontSize: 20.0
-        ),),
+        title: Text(
+          widget.title,
+          style: const TextStyle(
+            fontSize: 20.0,
+          ),
+        ),
         centerTitle: true,
         actions: [
           BlocBuilder<DataCubit, DataState>(
             builder: (context, state) {
-              return (state is DataFetchLoading) ? const CircularProgressIndicator():IconButton(
-                onPressed: () {
-                  BlocProvider.of<DataCubit>(context).getDataSnapshot();
-                },
-                icon: const Icon(Icons.cloud_download_outlined),
-                tooltip: 'Refresh Data',
-              );
+              return (state is DataFetchLoading)
+                  ? const CircularProgressIndicator()
+                  : IconButton(
+                      onPressed: () {
+                        BlocProvider.of<DataCubit>(context).getDataSnapshot();
+                      },
+                      icon: const Icon(Icons.cloud_download_outlined),
+                      tooltip: 'Refresh Data',
+                    );
             },
           ),
         ],
@@ -182,272 +196,200 @@ class DashboardState extends State<Dashboard> {
               );
           }
         },
-        child: SingleChildScrollView(
-          physics: _isKnobBeingInteractedWith
-              ? const NeverScrollableScrollPhysics()
-              : const AlwaysScrollableScrollPhysics(),
-          child: SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+        child:LayoutBuilder(builder: (context, constraints) {
+          if(constraints.maxWidth < 600){
+            return SingleChildScrollView(
+              physics: _isKnobBeingInteractedWith
+                  ? const NeverScrollableScrollPhysics()
+                  : const AlwaysScrollableScrollPhysics(),
+              child: SizedBox(
+                width: double.infinity,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Model window
+                    buildModelWindow(),
+                    SizedBox(height: intrinsicDeviceHeight * 0.01),
+                    // Knobs Box
+                    buildKnobsBox(),
+                    SizedBox(height: intrinsicDeviceHeight * 0.01),
+                    // Solar panel box
+                    buildSolarPanelBox(),
+                    SizedBox(height: intrinsicDeviceHeight * 0.01),
+                    SizedBox(height: intrinsicDeviceHeight * 0.05),
+                  ],
+                ),
+              ),
+            );
+          }else{
+            return Column(
               children: [
-                // Model window
-                SizedBox(
-                  child: Stack(
+                Flexible(flex:4, child: buildKnobsBox(lockable: false)),
+                Flexible(flex:1, child: buildSolarPanelBox(upperVisible: false)),
+
+              ],
+            );
+          }
+
+        })
+
+          ,
+      ),
+    );
+  }
+
+
+  Widget buildModelWindow(){
+    return SizedBox(
+      child: Stack(
+        children: [
+          Container(
+            height: modelWindowHeight,
+            width: containersWidth,
+            decoration: borderDecorations,
+            child: _show3DModel
+                ? Visibility(
+              visible: _show3DModel,
+              child: SizedBox(
+                height: modelWindowHeight,
+                width: modelWindowHeight,
+                child: const ModelViewer(
+                  backgroundColor: Colors.transparent,
+                  src:
+                  'assets/3d_models/solar_tracker_model.gltf',
+                  alt: '3D Model',
+                  autoRotate: true,
+                  disableZoom: false,
+                  loading: Loading.eager,
+                  reveal: Reveal.auto,
+                  cameraControls: true,
+                  autoPlay: true,
+                ),
+              ),
+            )
+                : GestureDetector(
+              onTap: () {
+                setState(() {
+                  _show3DModel = !_show3DModel;
+                });
+              },
+              child: Icon(
+                Icons.threed_rotation_rounded,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                _show3DModel = !_show3DModel;
+              });
+            },
+            icon: SafeIcon(
+              icon: _show3DModel
+                  ? Icons.visibility_off
+                  : Icons.visibility,
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildKnobsBox({bool? lockable}){
+    return IntrinsicHeight(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GestureDetector(
+          onTap: lockable ?? true ? () {
+            setState(() {
+              _isKnobBeingInteractedWith =
+              !_isKnobBeingInteractedWith;
+            });
+          }:null,
+          child: Container(
+            width: containersWidth,
+            decoration: borderDecorations.copyWith(
+              color: _isKnobBeingInteractedWith
+                  ? Colors.grey[300]
+                  : null,
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Column(
                     children: [
-                      Container(
-                        height: modelWindowHeight,
-                        width: containersWidth,
-                        decoration: borderDecorations,
-                        child: _show3DModel
-                            ? Visibility(
-                                visible: _show3DModel,
-                                child: SizedBox(
-                                  height: modelWindowHeight,
-                                  width: modelWindowHeight,
-                                  child: const ModelViewer(
-                                    backgroundColor: Colors.transparent,
-                                    src: 'assets/3d_models/solar_tracker_model.gltf',
-                                    alt: '3D Model',
-                                    autoRotate: true,
-                                    disableZoom: false,
-                                    loading: Loading.eager,
-                                    reveal: Reveal.auto,
-                                    cameraControls: true,
-                                    autoPlay: true,
-                                  ),
-                                ),
-                              )
-                            : GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _show3DModel = !_show3DModel;
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.threed_rotation_rounded,
-                                  size: 0.8 * modelWindowHeight,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _show3DModel = !_show3DModel;
-                          });
-                        },
-                        icon: SafeIcon(
-                          icon: _show3DModel ? Icons.visibility_off : Icons.visibility,
-                          color: Colors.grey,
-                        ),
-                      ),
+                      SizedBox(width: intrinsicDeviceWidth * 0.03),
+                      KnobWheel(
+                          controller: _bodyKnobController,
+                          size: knobSize,
+                          style: style,
+                          label:
+                          'Body Knob Value: ${_bodyKnobValue.toString()}'),
+                       SizedBox(
+                          width: minHorizontalSeparation),
                     ],
                   ),
-                ),
-
-                // Show model button
-
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
-                // Knobs Box
-                IntrinsicHeight(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-
-                      onTap: () {
-                        setState(() {
-                          _isKnobBeingInteractedWith = !_isKnobBeingInteractedWith;
-                        });
-                      },
-                      child: Container(
-                        width: containersWidth,
-                        decoration: borderDecorations.copyWith(
-                          color: _isKnobBeingInteractedWith ? Colors.grey[300] : null,
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      /// Mode switch box
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: 3.0,
                         ),
-                        child: IntrinsicHeight(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Column(
-                                children: [
-                                  SizedBox(width: intrinsicDeviceWidth * 0.03),
-                                  KnobWheel(
-                                      controller: _bodyKnobController,
-                                      size: knobSize,
-                                      style: style,
-                                      label: 'Body Knob Value: ${_bodyKnobValue.toString()}'),
-                                  const SizedBox(width: minHorizontalSeparation),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  /// Mode switch box
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      top: 3.0,
-                                    ),
-                                    child: Container(
-                                      decoration: borderDecorations,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(1.0),
-                                        child: Column(
-                                          children: [
-                                            MyToggleSwitch(
-                                              isSwitched: _isModeSwitched,
-                                              onChanged: (val) {
-                                                context.read<DataCubit>().setMode(val);
-                                                setState(() {
-                                                  _isModeSwitched = val;
-                                                });
-                                              },
-                                            ),
-                                            Text(
-                                              _isModeSwitched ? "Auto" : "Manual",
-                                              style: TextStyle(
-                                                fontSize: dataFontSize,
-                                                fontWeight: FontWeight.bold,
-                                                color: Theme.of(context).primaryColor,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-
-                                ],
-                              ),
-                              Column(
-                                children: [
-                                  KnobWheel(
-                                    controller: _armKnobController,
-                                    size: knobSize,
-                                    style: style,
-                                    label: 'Arm Knob Value: ${_armKnobValue.toString()}',
-                                  ),
-                                  SizedBox(width: intrinsicDeviceWidth * 0.03),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
-
-
-                // Solar panel box
-                Container(
-                  width: containersWidth,
-                  decoration: borderDecorations,
-                  child: IntrinsicHeight(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 8.0,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Icon(
-                                  Icons.solar_power,
-                                  size: containersWidth * 0.1,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Text("Solar Panel Data",
-                                  style: TextStyle(
-                                    fontSize: containersWidth * 0.05,
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).primaryColor,
-                                  )),
-                            ],
-                          ),
-                        ),
-                        Divider(
-                          color: lineColor,
-                          thickness: 1,
-                        ),
-                        IntrinsicHeight(
+                        child: Container(
+                          decoration: borderDecorations,
                           child: Padding(
-                            padding: const EdgeInsets.only(
-                              bottom: 8.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            padding: const EdgeInsets.all(1.0),
+                            child: Column(
                               children: [
-                                Icon(Icons.electric_bolt, size: containersWidth * 0.04),
-                                Text("Solar Panel Voltage: ",
-                                    style: TextStyle(
-                                      fontSize: dataFontSize,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).primaryColor,
-                                    )),
-                                BlocBuilder<DataCubit, DataState>(
-                                  builder: (context, state) {
-                                    if (state is DataFetchLoaded) {
-                                      return Text(
-                                        (state).data.cellVoltage.toStringAsFixed(3),
-                                        style: TextStyle(
-                                          fontSize: dataFontSize,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      );
-                                    }
-                                    return const CircularProgressIndicator();
+                                MyToggleSwitch(
+                                  isSwitched: _isModeSwitched,
+                                  onChanged: (val) {
+                                    context
+                                        .read<DataCubit>()
+                                        .setMode(val);
+                                    setState(() {
+                                      _isModeSwitched = val;
+                                    });
                                   },
                                 ),
-                                VerticalDivider(
-                                  color: lineColor,
-                                  thickness: 1,
-                                  width: 10,
-                                ),
-                                Icon(Icons.battery_4_bar_outlined,
-                                    size: containersWidth * 0.04),
-                                Text("Solar Panel Current: ",
-                                    style: TextStyle(
-                                      fontSize: dataFontSize,
-                                      fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).primaryColor,
-                                    )),
-                                BlocBuilder<DataCubit, DataState>(
-                                  builder: (context, state) {
-                                    if (state is DataFetchLoaded) {
-                                      return Text(
-                                        (state).data.cellCurrent.toStringAsFixed(3),
-                                        style: TextStyle(
-                                          fontSize: dataFontSize,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.green,
-                                        ),
-                                      );
-                                    }
-                                    return const CircularProgressIndicator();
-                                  },
+                                Text(
+                                  _isModeSwitched
+                                      ? "Auto"
+                                      : "Manual",
+                                  style: TextStyle(
+                                    fontSize: dataFontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context)
+                                        .primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
-
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: intrinsicDeviceHeight * 0.01),
-                SizedBox(height: intrinsicDeviceHeight * 0.05),
-              ],
+                  Column(
+                    children: [
+                      KnobWheel(
+                        controller: _armKnobController,
+                        size: knobSize,
+                        style: style,
+                        label:
+                        'Arm Knob Value: ${_armKnobValue.toString()}',
+                      ),
+                      SizedBox(width: intrinsicDeviceWidth * 0.03),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -455,11 +397,131 @@ class DashboardState extends State<Dashboard> {
     );
   }
 
+
+  Widget buildSolarPanelBox({bool? upperVisible}) {
+    return Container(
+      width: containersWidth,
+      decoration: borderDecorations,
+      child: IntrinsicHeight(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            if (upperVisible ?? true) ...<Widget>[
+              Padding(
+                padding: const EdgeInsets.only(
+                  top: 8.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Icon(
+                        Icons.solar_power,
+                        size: containersWidth * 0.1,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text("Solar Panel Data",
+                        style: TextStyle(
+                          fontSize: containersWidth * 0.05,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        )),
+                  ],
+                ),
+              ),
+              Divider(
+                color: lineColor,
+                thickness: 1,
+              ),
+            ],
+
+
+
+            IntrinsicHeight(
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 8.0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Icon(Icons.electric_bolt,
+                        size: containersWidth * 0.04),
+                    Text("Solar Panel Voltage: ",
+                        style: TextStyle(
+                          fontSize: dataFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        )),
+                    BlocBuilder<DataCubit, DataState>(
+                      builder: (context, state) {
+                        if (state is DataFetchLoaded) {
+                          return Text(
+                            (state)
+                                .data
+                                .cellVoltage
+                                .toStringAsFixed(3),
+                            style: TextStyle(
+                              fontSize: dataFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          );
+                        }
+                        return const CircularProgressIndicator();
+                      },
+                    ),
+                    VerticalDivider(
+                      color: lineColor,
+                      thickness: 1,
+                      width: 10,
+                    ),
+                    Icon(Icons.battery_4_bar_outlined,
+                        size: containersWidth * 0.04),
+                    Text("Solar Panel Current: ",
+                        style: TextStyle(
+                          fontSize: dataFontSize,
+                          fontWeight: FontWeight.bold,
+                          color: Theme.of(context).primaryColor,
+                        )),
+                    BlocBuilder<DataCubit, DataState>(
+                      builder: (context, state) {
+                        if (state is DataFetchLoaded) {
+                          return Text(
+                            (state)
+                                .data
+                                .cellCurrent
+                                .toStringAsFixed(3),
+                            style: TextStyle(
+                              fontSize: dataFontSize,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green,
+                            ),
+                          );
+                        }
+                        return const CircularProgressIndicator();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   void dispose() {
-    _bodyKnobController.removeOnValueChangedListener(valueChangedListenerBodyKnob);
+    _bodyKnobController
+        .removeOnValueChangedListener(valueChangedListenerBodyKnob);
     _bodyKnobController.dispose();
-    _armKnobController.removeOnValueChangedListener(valueChangedListenerArmKnob);
+    _armKnobController
+        .removeOnValueChangedListener(valueChangedListenerArmKnob);
     _armKnobController.dispose();
     super.dispose();
   }
